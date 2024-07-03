@@ -25,41 +25,47 @@ public class SubscriptionService {
     //private BitlyService bitlyService;
 
     private final RazorpayClient razorpayClient;
+    private final UserRequest userRequest;
+    private final PaymentResponseEntity paymentResponse;
+    private int paymentStatusId;
     
     @Autowired
-    public SubscriptionService(RazorpayClient razorpayClient) {
+    public SubscriptionService(RazorpayClient razorpayClient, UserRequest userRequest, PaymentResponseEntity paymentResponse) {
         this.razorpayClient = razorpayClient;
+		this.userRequest = userRequest;
+		this.paymentResponse = paymentResponse;
+		
         
     }
     
     
     
-    public SubscriptionResponseDTO createSubscriptionAndInsertDB(String PlanId, int MonthlyCycle, UserRequest userRequest) throws Exception {
-    	System.out.println(PlanId);
-    	System.out.println(MonthlyCycle);
+    
+    public SubscriptionResponseDTO createSubscriptionAndInsertDB(String PlanId, int MonthlyCycle, UserRequest user) throws Exception {
+  
         JSONObject subscriptionRequest = new JSONObject();
         subscriptionRequest.put("plan_id", PlanId);
         subscriptionRequest.put("total_count", MonthlyCycle);
         subscriptionRequest.put("quantity", 1);
         subscriptionRequest.put("customer_notify", 0);   
-        
-        //Create Subscription
+//        
+//        //Create Subscription
         Subscription subscription = razorpayClient.subscriptions.create(subscriptionRequest);
-       
-        // Set Data in model class  SubscriptionResponseDTO fetching from  RazorPay Subscription Class
+//       
+//        // Set Data in model class  SubscriptionResponseDTO fetching from  RazorPay Subscription Class
         SubscriptionResponseDTO responseDTO  = new SubscriptionResponseDTO();
         responseDTO.setSubscriptionId(subscription.get("id")); 
         responseDTO.setStatus(subscription.get("status"));
         responseDTO.setSubscriptionLink(subscription.get("short_url"));
         
-        // Get Data In UserRequest and set in SubscriptionResponseDTO
-      
+//        // Get Data In UserRequest and set in SubscriptionResponseDTO
+//      
         System.out.println(userRequest);
     	responseDTO.setUserId(userRequest.getUser_id());
     	responseDTO.setPlanId(userRequest.getPlan_id());
     	responseDTO.setOrganizationId(userRequest.getOrganization_id()); 
     	
-        return responseDTO;    
+        return null;    
     }
     
     
@@ -80,36 +86,58 @@ public class SubscriptionService {
     }
     
     
-    public JSONObject VerificationService(String razorpaySuscriptionId, String paymentId) throws RazorpayException, ParseException {
+    public JSONObject VerificationService(String razorpaySuscriptionId, String paymentId, Long userId, Long organizationId) throws RazorpayException, ParseException {
 //    	feching payment details
     	Payment razorPayPayment = razorpayClient.payments.fetch(paymentId);
     	
     	// Set Data in PaymentEntity
-    	PaymentResponseEntity paymentResponse = new PaymentResponseEntity();
     	paymentResponse.setRazorpayPaymentId(paymentId);
     	paymentResponse.setRazorpayOrderId(razorPayPayment.get("order_id"));
+    	paymentResponse.setRazorPaySubscriptionId(razorpaySuscriptionId);
+    	paymentResponse.setUserId(userId);
+    	paymentResponse.setOrganizationId(organizationId);
+    	
+    	JSONObject jsonObject = new JSONObject();
+    	//captured and  Status fetch 
+    	Boolean captured = razorPayPayment.get("captured");
+    	String status = razorPayPayment.get("status");
+    	
+    	if(captured && status.equalsIgnoreCase("captured")) {
+    		paymentStatusId = 1;
+    		jsonObject.put("Status", "paid");
+     	    jsonObject.put("Transaction", "Successful");
+    	}
+    	else if(!captured && status.equalsIgnoreCase("failed")) {
+    		paymentStatusId = 2;
+    		String error_description = razorPayPayment.get("error_description");
+    		String error_source = razorPayPayment.get("error_source");
+    		String error_step = razorPayPayment.get("error_step");
+    		String error_reason = razorPayPayment.get("error_reason");
+    		jsonObject.put("Status", "failed");
+    		jsonObject.put("payment_cancelled", error_reason);
+     	    jsonObject.put("error_description", error_description);
+     	    jsonObject.put("error_source", error_source);
+    	    jsonObject.put("error_step", error_step);   	    
+    	}
+    	else{
+    		paymentStatusId = 3;
+    		jsonObject.put("Status", "refunded");
+     	    jsonObject.put("Transaction", "proceed");
+    		
+    	}
+    	 
+    	paymentResponse.setPaymentStatusId(paymentStatusId); 	
     	paymentResponse.setAmount(razorPayPayment.get("amount"));
     	paymentResponse.setPaymentMode(razorPayPayment.get("method"));
     	paymentResponse.setUserEmail(razorPayPayment.get("email"));
     	paymentResponse.setContact(razorPayPayment.get("contact"));
-    	paymentResponse.setCreatedAt(razorPayPayment.get("created_at"));
-    	paymentResponse.setStatus(razorPayPayment.get("status"));
-    	paymentResponse.setCaptured(razorPayPayment.get("captured"));
-//    	paymentResponse.setSubscriptionId(razorpaySuscriptionId);
-//    	paymentResponse.setInvoiceId(razorPayPayment.get(""));
-//    	
-//    	Invoice invoice = razorpayClient.invoices.fetch()
-    	
-    	
+    	paymentResponse.setCreatedOn(razorPayPayment.get("created_at"));
+    	        
+   
     	System.out.println(paymentResponse);
-    	JSONObject jsonObject = razorPayPayment.toJson();
     	
     	
     	return jsonObject;
-    	
-    	
-    	
-    	
     }
 
     private Date convertUnixTimeToDate(Object unixTime) throws ParseException {

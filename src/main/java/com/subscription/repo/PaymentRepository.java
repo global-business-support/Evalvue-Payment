@@ -16,17 +16,20 @@ public interface PaymentRepository extends JpaRepository<PaymentResponseEntity,L
  
 	    @Modifying
 	    @Transactional
-	    @Query(value = "INSERT INTO Payment (RazorpayPaymentId, RazorpayOrderId, Amount, PaymentMode, UserEmail, Contact, CreatedAt, Status, Captured) VALUES (:razorpayPaymentId, :razorpayOrderId, :amount, :paymentMode, :userEmail, :contact, :createdAt, :status, :captured)", nativeQuery = true)
+	    @Query(value = "INSERT INTO Payment (RazorpayPaymentId, RazorpayOrderId, RazorPaySubscriptionId, UserId, OrganizationId, PaymentStatusId, Amount, PaymentMode, UserEmail, Contact, CreatedOn) "
+	    		+ "VALUES (:razorpayPaymentId, :razorpayOrderId, :razorPaySubscriptionId, :userId, :organizationId, :paymentStatusId, :amount, :paymentMode, :userEmail, :contact, :createdOn)", nativeQuery = true)
 	    void insertPaymentResponse(
 	        @Param("razorpayPaymentId") String razorpayPaymentId,
 	        @Param("razorpayOrderId") String razorpayOrderId,
+	        @Param("razorPaySubscriptionId") String razorPaySubscriptionId,
+	        @Param("userId")Long userId,
+	        @Param("organizationId")Long organizationId,
+	        @Param("paymentStatusId") int paymentStatusId,
 	        @Param("amount") int amount,
 	        @Param("paymentMode") String paymentMode,
 	        @Param("userEmail") String userEmail,
 	        @Param("contact") String contact,
-	        @Param("createdAt") Date createdAt,
-	        @Param("status") String status,
-	        @Param("captured") Boolean captured
+	        @Param("createdOn") Date createdOn
 	    );
 
 }
