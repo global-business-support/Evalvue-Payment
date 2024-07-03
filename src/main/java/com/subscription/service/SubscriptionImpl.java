@@ -28,6 +28,9 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	
 	@Autowired
 	PaymentRepository paymentRepository;
+	
+	@Autowired
+	PaymentResponseEntity paymEntity;
 
 	@Override
 	public Plan getPlan(int planId) {	
@@ -37,7 +40,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			
 		    Object[] object = planObj.get(0);
 		    if(object == null){
-				System.out.println("object is null");
+				System.err.println("object is null");
 			}
 		    for(Object obj : object) {
 		    	 System.out.println(obj);
@@ -53,7 +56,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			
 			
 		} catch (Exception e) {
-			System.out.println("Plan give some error in fetching");
+			System.err.println("Plan give some error in fetching");
 			e.printStackTrace();
 		}
 		return null;	    
@@ -67,7 +70,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			
 			System.out.println(updateSubscriptionDTO);
 			
-			System.out.println(updateSubscriptionDTO  == null ? "Fetching Subcription is NUll"  : "Fetch Subscription successfull");
+			System.err.println(updateSubscriptionDTO  == null ? "Fetching Subcription is NUll"  : "Fetch Subscription successfull");
 			
 			//Update Data in DB By subscriptionId
 			subscriptionRepo.updateSubscriptionDetailsById(
@@ -81,9 +84,9 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			System.out.println("data update successful");
 			return true;
 		} catch (RazorpayException e) {
-			System.out.println("Fetching Subcription error");
+			System.err.println("Fetching Subcription error");
 		} catch (ParseException e) {
-			System.out.println("Unix time Converter error in FetchSubscription");
+			System.err.println("Unix time Converter error in FetchSubscription");
 			e.printStackTrace();
 		}
 		return false;
@@ -94,7 +97,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 		try {	
 			SubscriptionResponseDTO subscriptionDTO = subscriptionService.createSubscriptionAndInsertDB(razorPayPlanId, monthlyCycle, userRequest);
 			if(subscriptionDTO == null) {
-				System.out.println("SubscriptionResponseDTO is Null in CreateSubcription method");
+				System.err.println("SubscriptionResponseDTO is Null in CreateSubcription method");
 			}
 			System.out.println("SubscriptionResponseDTO Data is present...");
 			System.out.println(subscriptionDTO);
@@ -120,36 +123,46 @@ public class SubscriptionImpl implements SubscriptionInterface {
 		        return response;
 			
 		} catch (Exception e) {
-			System.out.println("Subcription created some Error");
+			System.err.println("Subcription created some Error");
+			e.printStackTrace();
 		}
 		return null;	
 	}
 
 	@Override
-	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId) {
+	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId, Long userId, Long organizationId) {
 		try {
-			JSONObject response = subscriptionService.VerificationService(razorpaySubscriptionId, paymentId);
-			PaymentResponseEntity paymEntity = new PaymentResponseEntity();
+			JSONObject response = subscriptionService.VerificationService(razorpaySubscriptionId, paymentId, userId, organizationId);
+			
+			
+			System.out.println("hii....");
+			System.out.println(paymEntity);
 			
 			// insert data in db
 			paymentRepository.insertPaymentResponse(
 					paymEntity.getRazorpayPaymentId(),
 					paymEntity.getRazorpayOrderId(),
+					paymEntity.getRazorPaySubscriptionId(),
+					paymEntity.getUserId(),
+				    paymEntity.getOrganizationId(),
+			        paymEntity.getPaymentStatusId(),
 					paymEntity.getAmount(),
 					paymEntity.getPaymentMode(),
 					paymEntity.getUserEmail(),
 					paymEntity.getContact(),
-					paymEntity.getCreatedAt(),
-					paymEntity.getStatus(),
-					paymEntity.getCaptured());
+					paymEntity.getCreatedOn()
+					);
+					
+			     
+			       
 			
 			System.out.println("Successfull insert in db");
 			return response;
 		} catch (RazorpayException e) {
-			System.out.println("payment feching some error");
+			System.err.println("payment feching some error");
 			e.printStackTrace();
 		} catch (ParseException e) {
-			System.out.println("Unix Time Converter feching some error in Paymen Fetching");
+			System.err.println("Unix Time Converter feching some error in Paymen Fetching");
 			e.printStackTrace();
 		}
 		return null;

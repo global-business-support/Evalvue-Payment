@@ -26,13 +26,22 @@ public class SubscriptionController {
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
 	@Autowired
-	private SubscriptionInterface subscriptionInterface;
+	private final SubscriptionInterface subscriptionInterface;
+	private final UserRequest userRequest;
+
+    @Autowired
+    public SubscriptionController(UserRequest userRequest , SubscriptionInterface subscriptionInterface ) {
+        this.subscriptionInterface = subscriptionInterface;
+		this.userRequest = userRequest;
+    }
 
 	@PostMapping("/create/subscription")
 	public ResponseEntity<?> createSubscription(@RequestBody UserRequest request) {
 		try {
 			logger.info("Received request: {}", request.toString());
-
+			userRequest.setUser_id(request.getUser_id());
+	        userRequest.setOrganization_id(request.getOrganization_id());
+	        userRequest.setPlan_id(request.getPlan_id());
 			// Call get plan and return
 			Plan plan = subscriptionInterface.getPlan(request.getPlan_id());
 
@@ -41,7 +50,7 @@ public class SubscriptionController {
 					plan.getMonthlyCycle(), request);
 
 			if (jsonResponse == null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Subscription ID Not Created");
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Json Response Is null");
 			}
 			
 			HttpHeaders headers = new HttpHeaders();
@@ -67,10 +76,11 @@ public class SubscriptionController {
 		return false;
 	}
 
+	
 	@GetMapping("/verify-payment")
-	public ResponseEntity<String> verifyPayment(@RequestParam String razorpay_Subscription_Id,
-			@RequestParam String payment_id) {
-		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(razorpay_Subscription_Id, payment_id);
+	public ResponseEntity<String> verifyPayment(@RequestParam Long user_id, @RequestParam Long organization_id, @RequestParam String payment_id, @RequestParam String razorpay_Subscription_Id
+			) {
+		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(razorpay_Subscription_Id, payment_id, user_id, organization_id );
 
 		if (jsonResponse == null) {
 			System.out.println("json is null...");
