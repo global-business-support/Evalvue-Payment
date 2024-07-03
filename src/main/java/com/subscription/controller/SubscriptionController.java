@@ -38,8 +38,7 @@ public class SubscriptionController {
 	@PostMapping("/create/subscription")
 	public ResponseEntity<?> createSubscription(@RequestBody UserRequest request) {
 		try { 
-			
-			//Commen t
+		
 			logger.info("Received request: {}", request.toString());
 			userRequest.setUser_id(request.getUser_id());
 	        userRequest.setOrganization_id(request.getOrganization_id());
