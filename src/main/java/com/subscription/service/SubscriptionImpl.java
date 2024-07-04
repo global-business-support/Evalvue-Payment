@@ -1,12 +1,18 @@
 package com.subscription.service;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.razorpay.Invoice;
+import com.razorpay.RazorpayClient;
 import com.razorpay.RazorpayException;
 import com.subscription.model.Plan;
 import com.subscription.repo.PaymentRepository;
@@ -31,6 +37,9 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	
 	@Autowired
 	private PaymentResponseEntity paymEntity;
+	
+	@Autowired
+	RazorpayClient razorpayClient;
 
 	@Override
 	public Plan getPlan(int planId) {	
@@ -165,6 +174,6 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			e.printStackTrace();
 		}
 		return null;
-	}
+	}	
 
 }
