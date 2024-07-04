@@ -26,7 +26,7 @@ public class SubscriptionController {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
-	@Autowired
+
 	private final SubscriptionInterface subscriptionInterface;
 	private final UserRequest userRequest;
 
@@ -36,7 +36,7 @@ public class SubscriptionController {
 		this.userRequest = userRequest;
     }
 
-	@PostMapping("/create/subscription")
+	@PostMapping("/create/subscription/")
 	public ResponseEntity<?> createSubscription(@RequestBody UserRequest request) {
 		try { 
 		
@@ -67,7 +67,7 @@ public class SubscriptionController {
 	}
 
 	
-	@PostMapping("/verify/payment")
+	@PostMapping("/verify/payment/")
 	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest)
 			 {
 		System.out.println("get data "+ paymentRequest);
@@ -83,4 +83,6 @@ public class SubscriptionController {
 
 		return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
 	}
+	
+	
 }

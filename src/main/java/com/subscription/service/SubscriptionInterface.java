@@ -10,5 +10,6 @@ public interface SubscriptionInterface {
 	public Plan getPlan(int planId);
 	public JSONObject createSubscription(String PlanId, int MonthlyCycle, UserRequest userRequest);
 	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId, Long userId, Long organizationId);
+	
 
 }
