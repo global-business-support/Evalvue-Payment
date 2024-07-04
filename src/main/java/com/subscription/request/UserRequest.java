@@ -7,17 +7,14 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "user")
 public class UserRequest {
 
-
 	private long user_id;
 	private long organization_id;
 	private int plan_id;
 
-	
 	public long getUser_id() {
 		return user_id;
 	}
 
-	
 	public void setUser_id(long user_id) {
 		this.user_id = user_id;
 	}
@@ -26,7 +23,6 @@ public class UserRequest {
 		return organization_id;
 	}
 
-	
 	public void setOrganization_id(long organization_id) {
 		this.organization_id = organization_id;
 	}
@@ -35,14 +31,14 @@ public class UserRequest {
 		return plan_id;
 	}
 
-	
 	public void setPlan_id(int plan_id) {
 		this.plan_id = plan_id;
 	}
 
-		@Override
+	@Override
 	public String toString() {
-		return "UserRequest [user_Id=" + user_id + ", organization_Id=" + organization_id + ", plan_Id=" + plan_id + "]";
+		return "UserRequest [user_Id=" + user_id + ", organization_Id=" + organization_id + ", plan_Id=" + plan_id
+				+ "]";
 	}
 
 }
