@@ -14,28 +14,28 @@ import com.subscription.response.SubscriptionResponseDTO;
 @Repository
 public interface SubscriptionRepository extends JpaRepository<SubscriptionResponseDTO, Long> {
 	
-	 @Modifying
-     @Transactional
-	 @Query(nativeQuery = true, value = "INSERT INTO Subscription(RazorPaySubscriptionId, SubcriptionLink, PlanId, Status, UserId, OrganizationId) VALUES (:razorPaySubscriptionId, :subcriptionLink, :planId, :status, :userId, :organizationId)")
-	    public void saveAllDetailsById(
-	                            @Param("razorPaySubscriptionId") String razorPaySubscriptionId, 
-	                            @Param("subcriptionLink") String subcriptionLink,
-	                            @Param("planId") int planId,
-	                            @Param("status") String status,
-	                            @Param("userId") Long userId,
-	                            @Param("organizationId") Long organizationId);
+	  @Modifying
+	    @Transactional
+	    @Query(nativeQuery = true, value = "INSERT INTO Subscription (RazorPaySubscriptionId, SubscriptionLink, PlanId, SubscriptionStatusId, UserId, OrganizationId) VALUES (:razorPaySubscriptionId, :subscriptionLink, :planId, :subscriptionStatusId, :userId, :organizationId)")
+	    void saveAllDetailsById(
+	            @Param("razorPaySubscriptionId") String razorPaySubscriptionId,
+	            @Param("subscriptionLink") String subscriptionLink,
+	            @Param("planId") int planId,
+	            @Param("subscriptionStatusId") int subscriptionStatusId,
+	            @Param("userId") Long userId,
+	            @Param("organizationId") Long organizationId);
+	
 	 
-	 
-		@Transactional
-		@Modifying
-		@Query(nativeQuery = true, value = "UPDATE Subscription SET StartDate = :startDate, NextDueDate = :nextDueDate, EndDate = :endDate, Status = :status WHERE RazorPaySubscriptionId = :razorPaySubscriptionId ")
-		public void updateSubscriptionDetailsById(
-				@Param("razorPaySubscriptionId") String razorPaySubscriptionId,
-				@Param("startDate") Date startDate,
-				@Param("nextDueDate") Date nextDueDate,
-				@Param("endDate") Date endDate,
-				@Param("status") String status
-				);
+	  @Modifying
+	    @Transactional
+	    @Query(nativeQuery = true, value = "UPDATE Subscription SET StartDate = :startDate, NextDueDate = :nextDueDate, EndDate = :endDate, SubscriptionStatusId = :subscriptionStatusId WHERE RazorPaySubscriptionId = :razorPaySubscriptionId")
+	    void updateSubscriptionDetailsById(
+	            @Param("razorPaySubscriptionId") String razorPaySubscriptionId,
+	            @Param("startDate") Date startDate,
+	            @Param("nextDueDate") Date nextDueDate,
+	            @Param("endDate") Date endDate,
+	            @Param("subscriptionStatusId") int subscriptionStatusId
+	    );
 		         
 
 }

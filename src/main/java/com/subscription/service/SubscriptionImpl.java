@@ -27,10 +27,10 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	private SubscriptionService subscriptionService;
 	
 	@Autowired
-	PaymentRepository paymentRepository;
+	private PaymentRepository paymentRepository;
 	
 	@Autowired
-	PaymentResponseEntity paymEntity;
+	private PaymentResponseEntity paymEntity;
 
 	@Override
 	public Plan getPlan(int planId) {	
@@ -62,31 +62,31 @@ public class SubscriptionImpl implements SubscriptionInterface {
 		return null;	    
 	}
 
+	
 	 @Transactional
-	public Boolean FecthSubcriptionDetailsById(String subscriptionId) {
+	private Boolean updateSubcriptionDetailsById(String subscriptionId) {
 		try {
-			System.out.println("1 step");
 			SubscriptionResponseDTO updateSubscriptionDTO =  subscriptionService.FecthSubcriptionDetails(subscriptionId);
 			
 			System.out.println(updateSubscriptionDTO);
 			
-			System.err.println(updateSubscriptionDTO  == null ? "Fetching Subcription is NUll"  : "Fetch Subscription successfull");
+			System.out.println(updateSubscriptionDTO  == null ? "Fetching Subcription is NUll"  : "Fetch Subscription successfull");
 			
 			//Update Data in DB By subscriptionId
 			subscriptionRepo.updateSubscriptionDetailsById(
-					updateSubscriptionDTO.getSubscriptionId(),
-	                updateSubscriptionDTO.getCreateDate(),
+					updateSubscriptionDTO.getRazorPaySubscriptionId(),
+	                updateSubscriptionDTO.getStartDate(),
 	                updateSubscriptionDTO.getNextDueDate(),
 	                updateSubscriptionDTO.getEndDate(),
-	                updateSubscriptionDTO.getStatus()
+	                updateSubscriptionDTO.getSubscriptionStatusId()
 	            );
-			
-			System.out.println("data update successful");
+		
 			return true;
 		} catch (RazorpayException e) {
-			System.err.println("Fetching Subcription error");
+			System.err.println("Updating Subcription error");
+			e.printStackTrace();
 		} catch (ParseException e) {
-			System.err.println("Unix time Converter error in FetchSubscription");
+			System.err.println("Unix time Converter error in Update Subscription");
 			e.printStackTrace();
 		}
 		return false;
@@ -96,30 +96,29 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	public JSONObject createSubscription(String razorPayPlanId, int monthlyCycle, UserRequest userRequest) {
 		try {	
 			SubscriptionResponseDTO subscriptionDTO = subscriptionService.createSubscriptionAndInsertDB(razorPayPlanId, monthlyCycle, userRequest);
+			System.out.println(subscriptionDTO);
 			if(subscriptionDTO == null) {
 				System.err.println("SubscriptionResponseDTO is Null in CreateSubcription method");
 			}
-			System.out.println("SubscriptionResponseDTO Data is present...");
-			System.out.println(subscriptionDTO);
-			System.out.println();	
-			
+				
 			// SET Entity Data in Subcripiton table in DB
 			subscriptionRepo.saveAllDetailsById(
-	                subscriptionDTO.getSubscriptionId(),
+	                subscriptionDTO.getRazorPaySubscriptionId(),
 	                subscriptionDTO.getSubscriptionLink(),
 	                subscriptionDTO.getPlanId(),
-	                subscriptionDTO.getStatus(),
+	                subscriptionDTO.getSubscriptionStatusId(),
 	                subscriptionDTO.getUserId(),
 	                subscriptionDTO.getOrganizationId()
 	            );
 			
-			System.out.println("Subscription created successfull");
+			System.out.println("Subscription created and insert in DB successfully ....");
 			
 			// Create Response object by JSON (get data in SubscriptionResponseDTO)
 			    JSONObject response = new JSONObject();
-		        response.put("subscriptionId",subscriptionDTO.getSubscriptionId());
+		        response.put("subscriptionId",subscriptionDTO.getRazorPaySubscriptionId());
 		        response.put("subscriptionLink", subscriptionDTO.getSubscriptionLink());
-		        response.put("status", subscriptionDTO.getStatus());
+		        response.put("status", ""+EnumMappingService.subscriptionStatusInString(subscriptionDTO.getSubscriptionStatusId()));
+		        
 		        return response;
 			
 		} catch (Exception e) {
@@ -132,12 +131,16 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	@Override
 	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId, Long userId, Long organizationId) {
 		try {
-			JSONObject response = subscriptionService.VerificationService(razorpaySubscriptionId, paymentId, userId, organizationId);
-			
-			
-			System.out.println("hii....");
 			System.out.println(paymEntity);
-			
+			JSONObject response = subscriptionService.VerificationService(razorpaySubscriptionId, paymentId, userId, organizationId);
+			Boolean b = updateSubcriptionDetailsById(razorpaySubscriptionId);
+             if(b) {
+            	 System.out.println("update subcription table Sucessfully");
+             }
+             else {
+            	 System.err.println("subcription table not update");
+             }
+		
 			// insert data in db
 			paymentRepository.insertPaymentResponse(
 					paymEntity.getRazorpayPaymentId(),
@@ -151,12 +154,8 @@ public class SubscriptionImpl implements SubscriptionInterface {
 					paymEntity.getUserEmail(),
 					paymEntity.getContact(),
 					paymEntity.getCreatedOn()
-					);
-					
-			     
-			       
-			
-			System.out.println("Successfull insert in db");
+			);
+			System.out.println("Pyment information Successfull insert in db");
 			return response;
 		} catch (RazorpayException e) {
 			System.err.println("payment feching some error");

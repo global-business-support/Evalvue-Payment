@@ -13,6 +13,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
 import com.subscription.model.Plan;
+import com.subscription.request.PaymentRequest;
 import com.subscription.request.UserRequest;
 import com.subscription.service.SubscriptionInterface;
 import org.json.JSONObject;
@@ -43,6 +44,7 @@ public class SubscriptionController {
 			userRequest.setUser_id(request.getUser_id());
 	        userRequest.setOrganization_id(request.getOrganization_id());
 	        userRequest.setPlan_id(request.getPlan_id());
+	        
 			// Call get plan and return
 			Plan plan = subscriptionInterface.getPlan(request.getPlan_id());
 
@@ -64,24 +66,12 @@ public class SubscriptionController {
 		}
 	}
 
-	@PostMapping("/fetchDeatils")
-	public Boolean fetchExistingSubscriptionId(@RequestParam String subscriptionId) {
-		try {
-			// call Fetching and return in boolean
-			Boolean b = subscriptionInterface.FecthSubcriptionDetailsById(subscriptionId);
-
-			return b;
-		} catch (Exception e) {
-			logger.error("subscription feching error");
-		}
-		return false;
-	}
-
 	
-	@GetMapping("/verify-payment")
-	public ResponseEntity<String> verifyPayment(@RequestParam Long user_id, @RequestParam Long organization_id, @RequestParam String payment_id, @RequestParam String razorpay_Subscription_Id
-			) {
-		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(razorpay_Subscription_Id, payment_id, user_id, organization_id );
+	@PostMapping("/verify/payment")
+	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest)
+			 {
+		System.out.println("get data "+ paymentRequest);
+		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(paymentRequest.getSubscription_id(), paymentRequest.getPayment_id(), paymentRequest.getUser_id(), paymentRequest.getOrganization_id() );
 
 		if (jsonResponse == null) {
 			System.out.println("json is null...");

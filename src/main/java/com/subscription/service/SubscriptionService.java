@@ -28,6 +28,8 @@ public class SubscriptionService {
     private final UserRequest userRequest;
     private final PaymentResponseEntity paymentResponse;
     private int paymentStatusId;
+    private Boolean captured;
+    private String status;
     
     @Autowired
     public SubscriptionService(RazorpayClient razorpayClient, UserRequest userRequest, PaymentResponseEntity paymentResponse) {
@@ -41,7 +43,7 @@ public class SubscriptionService {
     
     
     
-    public SubscriptionResponseDTO createSubscriptionAndInsertDB(String PlanId, int MonthlyCycle, UserRequest user) throws Exception {
+    public SubscriptionResponseDTO createSubscriptionAndInsertDB(String PlanId, int MonthlyCycle, UserRequest user) throws Exception, RazorpayException {
   
         JSONObject subscriptionRequest = new JSONObject();
         subscriptionRequest.put("plan_id", PlanId);
@@ -54,8 +56,9 @@ public class SubscriptionService {
 //       
 //        // Set Data in model class  SubscriptionResponseDTO fetching from  RazorPay Subscription Class
         SubscriptionResponseDTO responseDTO  = new SubscriptionResponseDTO();
-        responseDTO.setSubscriptionId(subscription.get("id")); 
-        responseDTO.setStatus(subscription.get("status"));
+        responseDTO.setRazorPaySubscriptionId(subscription.get("id")); 
+        status = subscription.get("status");
+        responseDTO.setSubscriptionStatusId(EnumMappingService.subscriptionStatus(status));
         responseDTO.setSubscriptionLink(subscription.get("short_url"));
         
 //        // Get Data In UserRequest and set in SubscriptionResponseDTO
@@ -65,17 +68,21 @@ public class SubscriptionService {
     	responseDTO.setPlanId(userRequest.getPlan_id());
     	responseDTO.setOrganizationId(userRequest.getOrganization_id()); 
     	
-        return null;    
+        return responseDTO;    
     }
     
     
     public SubscriptionResponseDTO FecthSubcriptionDetails(String subscriptionId) throws RazorpayException, ParseException {
    SubscriptionResponseDTO responseDTO = new SubscriptionResponseDTO();
     Subscription subscription = razorpayClient.subscriptions.fetch(subscriptionId);
-    responseDTO.setSubscriptionId(subscriptionId);
-    responseDTO.setStatus(subscription.get("status"));
-    responseDTO.setCreateDate(convertUnixTimeToDate(subscription.get("current_start")));
-    responseDTO.setNextDueDate(convertUnixTimeToDate(subscription.get("end_at")));
+    responseDTO.setRazorPaySubscriptionId(subscriptionId);
+    status = subscription.get("status");
+    responseDTO.setSubscriptionStatusId(EnumMappingService.subscriptionStatus(status));
+    System.out.println("current_start");
+    responseDTO.setStartDate(convertUnixTimeToDate(subscription.get("current_start")));
+    System.out.println("charge_at");
+    responseDTO.setNextDueDate(convertUnixTimeToDate(subscription.get("charge_at")));
+    System.out.println("end_at");
     responseDTO.setEndDate(convertUnixTimeToDate(subscription.get("end_at"))); 
     responseDTO.setSubscriptionLink(subscription.get("short_url"));
     
@@ -95,37 +102,12 @@ public class SubscriptionService {
     	paymentResponse.setRazorpayOrderId(razorPayPayment.get("order_id"));
     	paymentResponse.setRazorPaySubscriptionId(razorpaySuscriptionId);
     	paymentResponse.setUserId(userId);
-    	paymentResponse.setOrganizationId(organizationId);
-    	
-    	JSONObject jsonObject = new JSONObject();
+    	paymentResponse.setOrganizationId(organizationId);   	
     	//captured and  Status fetch 
     	Boolean captured = razorPayPayment.get("captured");
     	String status = razorPayPayment.get("status");
-    	
-    	if(captured && status.equalsIgnoreCase("captured")) {
-    		paymentStatusId = 1;
-    		jsonObject.put("Status", "paid");
-     	    jsonObject.put("Transaction", "Successful");
-    	}
-    	else if(!captured && status.equalsIgnoreCase("failed")) {
-    		paymentStatusId = 2;
-    		String error_description = razorPayPayment.get("error_description");
-    		String error_source = razorPayPayment.get("error_source");
-    		String error_step = razorPayPayment.get("error_step");
-    		String error_reason = razorPayPayment.get("error_reason");
-    		jsonObject.put("Status", "failed");
-    		jsonObject.put("payment_cancelled", error_reason);
-     	    jsonObject.put("error_description", error_description);
-     	    jsonObject.put("error_source", error_source);
-    	    jsonObject.put("error_step", error_step);   	    
-    	}
-    	else{
-    		paymentStatusId = 3;
-    		jsonObject.put("Status", "refunded");
-     	    jsonObject.put("Transaction", "proceed");
-    		
-    	}
-    	 
+    	paymentStatusId  = EnumMappingService.paymentStatus(captured, status);
+    	JSONObject jsonResponseObject = EnumMappingService.paymentResponse(paymentStatusId, razorPayPayment);   	 
     	paymentResponse.setPaymentStatusId(paymentStatusId); 	
     	paymentResponse.setAmount(razorPayPayment.get("amount"));
     	paymentResponse.setPaymentMode(razorPayPayment.get("method"));
@@ -136,11 +118,12 @@ public class SubscriptionService {
    
     	System.out.println(paymentResponse);
     	
-    	
-    	return jsonObject;
+	
+    	return jsonResponseObject;
     }
 
     private Date convertUnixTimeToDate(Object unixTime) throws ParseException {
+    	System.out.println(unixTime);
         long timestamp = Long.parseLong(unixTime.toString()) * 1000L;
         Date date = new Date(timestamp);
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
