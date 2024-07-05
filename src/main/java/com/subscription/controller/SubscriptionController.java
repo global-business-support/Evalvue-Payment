@@ -84,5 +84,16 @@ public class SubscriptionController {
 		return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
 	}
 	
+	@GetMapping("/payment/history/")
+    public ResponseEntity<?>PaymentHistory(@RequestParam String razorpay_SubscriptionId){
+		
+		System.out.println(razorpay_SubscriptionId);
+	   JSONObject json = subscriptionInterface.getPymentHistory(razorpay_SubscriptionId);
+	   
+	   if(json != null) {
+		   return ResponseEntity.ok(json.toString());
+	   }
 	
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(json.toString());
+	}
 }

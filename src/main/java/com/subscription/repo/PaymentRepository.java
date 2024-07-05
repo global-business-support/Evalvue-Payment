@@ -1,6 +1,7 @@
 package com.subscription.repo;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -16,8 +17,8 @@ public interface PaymentRepository extends JpaRepository<PaymentResponseEntity,L
  
 	    @Modifying
 	    @Transactional
-	    @Query(value = "INSERT INTO Payment (RazorpayPaymentId, RazorpayOrderId, RazorPaySubscriptionId, UserId, OrganizationId, PaymentStatusId, Amount, PaymentMode, UserEmail, Contact, CreatedOn) "
-	    		+ "VALUES (:razorpayPaymentId, :razorpayOrderId, :razorPaySubscriptionId, :userId, :organizationId, :paymentStatusId, :amount, :paymentMode, :userEmail, :contact, :createdOn)", nativeQuery = true)
+	    @Query(value = "INSERT INTO Payment (RazorpayPaymentId, RazorpayOrderId, RazorPaySubscriptionId, UserId, OrganizationId, PaymentStatusId, Amount, PaymentMode, UserEmail, Contact, CreatedOn, TransactionId) "
+	    		+ "VALUES (:razorpayPaymentId, :razorpayOrderId, :razorPaySubscriptionId, :userId, :organizationId, :paymentStatusId, :amount, :paymentMode, :userEmail, :contact, :createdOn, :transactionId )", nativeQuery = true)
 	    void insertPaymentResponse(
 	        @Param("razorpayPaymentId") String razorpayPaymentId,
 	        @Param("razorpayOrderId") String razorpayOrderId,
@@ -29,7 +30,18 @@ public interface PaymentRepository extends JpaRepository<PaymentResponseEntity,L
 	        @Param("paymentMode") String paymentMode,
 	        @Param("userEmail") String userEmail,
 	        @Param("contact") String contact,
-	        @Param("createdOn") Date createdOn
+	        @Param("createdOn") Date createdOn,
+	        @Param("transactionId")String transactionId
 	    );
 
-}
+	 
+	   
+
+	        @Transactional
+	        @Modifying
+	        @Query(nativeQuery = true, value =
+	            "SELECT p.RazorpayOrderId, p.TransactionId, ps.Name AS PaymentStatus, p.Amount, p.PaymentMode, o.Name AS Organization FROM Payment p JOIN PaymentStatus ps ON p.PaymentStatusId = ps.PaymentStatusId "
+	            + "JOIN Organization o ON p.OrganizationId = o.OrganizationId WHERE p.RazorPaySubscriptionId = :razorpaySubscriptionId")
+	        List<Object[]> getPaymentHistoryBySubscriptionId(@Param("razorpaySubscriptionId") String razorpaySubscriptionId);
+
+	    }

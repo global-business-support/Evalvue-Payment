@@ -39,7 +39,8 @@ public class PaymentResponseEntity {
 	private String contact;
 	@Column(name = "CreatedOn")
 	private Date createdOn;
-	
+	@Column(name = "TransactionId")
+	private String transactionId;
 	
 	public Long getPaymentId() {
 		return paymentId;
@@ -113,14 +114,22 @@ public class PaymentResponseEntity {
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
 	}
+	public String getTransactionId() {
+		return transactionId;
+	}
+	public void setTransactionId(String transactionId) {
+		this.transactionId = transactionId;
+	}
 	@Override
 	public String toString() {
 		return "PaymentResponseEntity [paymentId=" + paymentId + ", razorpayPaymentId=" + razorpayPaymentId
 				+ ", razorpayOrderId=" + razorpayOrderId + ", razorPaySubscriptionId=" + razorPaySubscriptionId
 				+ ", userId=" + userId + ", OrganizationId=" + OrganizationId + ", PaymentStatusId=" + PaymentStatusId
 				+ ", amount=" + amount + ", paymentMode=" + paymentMode + ", userEmail=" + userEmail + ", contact="
-				+ contact + ", createdOn=" + createdOn + "]";
+				+ contact + ", createdOn=" + createdOn + ", transactionId=" + transactionId + "]";
 	}
+	
+	
 	
 
 }
