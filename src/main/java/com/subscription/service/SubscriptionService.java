@@ -58,7 +58,7 @@ public class SubscriptionService {
         SubscriptionResponseDTO responseDTO  = new SubscriptionResponseDTO();
         responseDTO.setRazorPaySubscriptionId(subscription.get("id")); 
         status = subscription.get("status");
-        responseDTO.setSubscriptionStatusId(EnumMappingService.subscriptionStatus(status));
+        responseDTO.setSubscriptionStatusId(EnumMappingService.getSubscriptionStatusByString(status));
         responseDTO.setSubscriptionLink(subscription.get("short_url"));
         
 //        // Get Data In UserRequest and set in SubscriptionResponseDTO
@@ -77,7 +77,7 @@ public class SubscriptionService {
     Subscription subscription = razorpayClient.subscriptions.fetch(subscriptionId);
     responseDTO.setRazorPaySubscriptionId(subscriptionId);
     status = subscription.get("status");
-    responseDTO.setSubscriptionStatusId(EnumMappingService.subscriptionStatus(status));
+    responseDTO.setSubscriptionStatusId(EnumMappingService.getSubscriptionStatusByString(status));
     System.out.println("current_start");
     responseDTO.setStartDate(convertUnixTimeToDate(subscription.get("current_start")));
     System.out.println("charge_at");
@@ -106,7 +106,7 @@ public class SubscriptionService {
     	//captured and  Status fetch 
     	Boolean captured = razorPayPayment.get("captured");
     	String status = razorPayPayment.get("status");
-    	paymentStatusId  = EnumMappingService.paymentStatus(captured, status);
+    	paymentStatusId  = EnumMappingService.getPaymentStatus(captured, status);
     	JSONObject jsonResponseObject = EnumMappingService.paymentResponse(paymentStatusId, razorPayPayment);   	 
     	paymentResponse.setPaymentStatusId(paymentStatusId); 	
     	paymentResponse.setAmount(razorPayPayment.get("amount"));
@@ -114,11 +114,16 @@ public class SubscriptionService {
     	paymentResponse.setUserEmail(razorPayPayment.get("email"));
     	paymentResponse.setContact(razorPayPayment.get("contact"));
     	paymentResponse.setCreatedOn(razorPayPayment.get("created_at"));
-    	        
-   
+        
+    	JSONObject transecationId = razorPayPayment.get("acquirer_data");
+    	Object rrn = transecationId.get("rrn");
+    	if(rrn != null) {
+    		paymentResponse.setTransactionId(transecationId.getString("upi_transaction_id"));
+    	}
+    	else {
+    		paymentResponse.setTransactionId(null);
+    	}
     	System.out.println(paymentResponse);
-    	
-	
     	return jsonResponseObject;
     }
 

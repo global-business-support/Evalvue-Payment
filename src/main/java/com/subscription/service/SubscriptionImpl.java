@@ -1,5 +1,6 @@
 package com.subscription.service;
 
+import java.sql.SQLException;
 import java.text.ParseException;
 import java.util.HashMap;
 import java.util.List;
@@ -126,7 +127,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			    JSONObject response = new JSONObject();
 		        response.put("subscriptionId",subscriptionDTO.getRazorPaySubscriptionId());
 		        response.put("subscriptionLink", subscriptionDTO.getSubscriptionLink());
-		        response.put("status", ""+EnumMappingService.subscriptionStatusInString(subscriptionDTO.getSubscriptionStatusId()));
+		        response.put("status", ""+EnumMappingService.getSubscriptionStatusById(subscriptionDTO.getSubscriptionStatusId()));
 		        
 		        return response;
 			
@@ -162,7 +163,8 @@ public class SubscriptionImpl implements SubscriptionInterface {
 					paymEntity.getPaymentMode(),
 					paymEntity.getUserEmail(),
 					paymEntity.getContact(),
-					paymEntity.getCreatedOn()
+					paymEntity.getCreatedOn(),
+					paymEntity.getTransactionId()
 			);
 			System.out.println("Pyment information Successfull insert in db");
 			return response;
@@ -171,6 +173,29 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			e.printStackTrace();
 		} catch (ParseException e) {
 			System.err.println("Unix Time Converter feching some error in Paymen Fetching");
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+
+	@Override
+	public JSONObject getPymentHistory(String razorpaySubscriptionId) {
+		try {
+		List<Object[]> listOfObject = paymentRepository.getPaymentHistoryBySubscriptionId(razorpaySubscriptionId);
+		JSONObject jsonObject  = new JSONObject();
+		jsonObject.put("History", "Successful");
+		Object[] arrObjects = listOfObject.get(0);
+		jsonObject.put("RazorpayOrderId", arrObjects[0]);
+		jsonObject.put("TransactionId", arrObjects[1]);
+		jsonObject.put("PaymentStatus", arrObjects[2]);
+		jsonObject.put("Amount", arrObjects[3] );
+		jsonObject.put("PaymentMode", arrObjects[4]);
+		jsonObject.put("Organization", arrObjects[5]);
+		
+		
+		return jsonObject;
+		}catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
