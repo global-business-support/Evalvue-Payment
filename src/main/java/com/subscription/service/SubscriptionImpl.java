@@ -184,14 +184,13 @@ public class SubscriptionImpl implements SubscriptionInterface {
 		try {
 		List<Object[]> listOfObject = paymentRepository.getPaymentHistoryBySubscriptionId(razorpaySubscriptionId);
 		JSONObject jsonObject  = new JSONObject();
-		jsonObject.put("History", "Successful");
 		Object[] arrObjects = listOfObject.get(0);
-		jsonObject.put("RazorpayOrderId", arrObjects[0]);
-		jsonObject.put("TransactionId", arrObjects[1]);
-		jsonObject.put("PaymentStatus", arrObjects[2]);
-		jsonObject.put("Amount", arrObjects[3] );
-		jsonObject.put("PaymentMode", arrObjects[4]);
-		jsonObject.put("Organization", arrObjects[5]);
+		jsonObject.put("razorpay_order_id", arrObjects[0]);
+		jsonObject.put("transaction_id", ""+arrObjects[1]);
+		jsonObject.put("payment_status", arrObjects[2]);
+		jsonObject.put("amount", arrObjects[3] );
+		jsonObject.put("payment_mode", arrObjects[4]);
+		jsonObject.put("organization_name", arrObjects[5]);
 		
 		
 		return jsonObject;

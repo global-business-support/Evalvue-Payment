@@ -84,7 +84,7 @@ public class SubscriptionController {
 		return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
 	}
 	
-	@GetMapping("/payment/history/")
+	@PostMapping("/payment/receipt/")
     public ResponseEntity<?>PaymentHistory(@RequestParam String razorpay_SubscriptionId){
 		
 		System.out.println(razorpay_SubscriptionId);

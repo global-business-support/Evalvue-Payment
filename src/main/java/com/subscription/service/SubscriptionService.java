@@ -117,11 +117,9 @@ public class SubscriptionService {
         
     	JSONObject transecationId = razorPayPayment.get("acquirer_data");
     	Object rrn = transecationId.get("rrn");
-    	if(rrn != null) {
+    	System.out.println("rrn = "+rrn);
+    	if(!rrn.equals(null)) {
     		paymentResponse.setTransactionId(transecationId.getString("upi_transaction_id"));
-    	}
-    	else {
-    		paymentResponse.setTransactionId(null);
     	}
     	System.out.println(paymentResponse);
     	return jsonResponseObject;
