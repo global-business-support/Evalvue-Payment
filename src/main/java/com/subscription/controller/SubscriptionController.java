@@ -2,6 +2,7 @@ package com.subscription.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -85,15 +86,14 @@ public class SubscriptionController {
 	}
 	
 	@PostMapping("/payment/receipt/")
-    public ResponseEntity<?>PaymentHistory(@RequestParam String razorpay_SubscriptionId){
+    public ResponseEntity<?> PaymentHistory(@RequestParam String subscription_id){
 		
-		System.out.println(razorpay_SubscriptionId);
-	   JSONObject json = subscriptionInterface.getPymentHistory(razorpay_SubscriptionId);
+	   JSONObject json = subscriptionInterface.getPymentHistory(subscription_id);
 	   
 	   if(json != null) {
 		   return ResponseEntity.ok(json.toString());
-	   }
+	   }	
 	
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(json.toString());
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No content found");
 	}
 }
