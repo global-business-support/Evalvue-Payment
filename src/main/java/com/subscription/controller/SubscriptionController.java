@@ -38,7 +38,7 @@ public class SubscriptionController {
     }
 
 	@PostMapping("/create/subscription/")
-	public ResponseEntity<?> createSubscription(@RequestBody UserRequest request) {
+	public String createSubscription(@RequestBody UserRequest request) {
 		try { 
 		
 			logger.info("Received request: {}", request.toString());
@@ -54,16 +54,19 @@ public class SubscriptionController {
 					plan.getMonthlyCycle(), request);
 
 			if (jsonResponse == null) {
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Json Response Is null");
+				jsonResponse.put("payment_error", "Payment server down. Please try again sometime :)");
+				return jsonResponse.toString();
 			}
 			
 			HttpHeaders headers = new HttpHeaders();
 			headers.setContentType(MediaType.APPLICATION_JSON);
 
-			return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
+			return jsonResponse.toString();
 		} catch (Exception e) {
 			logger.error("Error creating subscription");
-			return ResponseEntity.status(500).body(false);
+			JSONObject error = new JSONObject();
+			error.put("payment_error", "Payment server down. please try again sometime :)");
+			return error.toString(); 
 		}
 	}
 
