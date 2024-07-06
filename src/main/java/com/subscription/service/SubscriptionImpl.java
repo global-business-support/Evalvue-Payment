@@ -104,6 +104,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 
 	@Override
 	public JSONObject createSubscription(String razorPayPlanId, int monthlyCycle, UserRequest userRequest) {
+		 JSONObject response = new JSONObject();
 		try {	
 			SubscriptionResponseDTO subscriptionDTO = subscriptionService.createSubscriptionAndInsertDB(razorPayPlanId, monthlyCycle, userRequest);
 			System.out.println(subscriptionDTO);
@@ -124,16 +125,23 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			System.out.println("Subscription created and insert in DB successfully ....");
 			
 			// Create Response object by JSON (get data in SubscriptionResponseDTO)
-			    JSONObject response = new JSONObject();
+			   
 		        response.put("subscriptionId",subscriptionDTO.getRazorPaySubscriptionId());
 		        response.put("subscriptionLink", subscriptionDTO.getSubscriptionLink());
 		        response.put("status", ""+EnumMappingService.getSubscriptionStatusById(subscriptionDTO.getSubscriptionStatusId()));
 		        
 		        return response;
 			
-		} catch (Exception e) {
+		}catch(RazorpayException e){ 
+			e.printStackTrace();
+			response.put("payment_error", "Payment server down. Please try again sometime :)");
+			return response;
+		}
+		
+		catch (Exception e) {
 			System.err.println("Subcription created some Error");
 			e.printStackTrace();
+			response.put("payment_error", "Payment server down. Please try again sometime :)");
 		}
 		return null;	
 	}
