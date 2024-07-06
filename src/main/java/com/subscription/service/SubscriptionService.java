@@ -126,6 +126,9 @@ public class SubscriptionService {
     }
 
     private Date convertUnixTimeToDate(Object unixTime) throws ParseException {
+    	if(unixTime.equals(null)) {
+    		return null;
+    	}
     	System.out.println(unixTime);
         long timestamp = Long.parseLong(unixTime.toString()) * 1000L;
         Date date = new Date(timestamp);
