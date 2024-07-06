@@ -119,7 +119,7 @@ public class SubscriptionService {
     	Object rrn = transecationId.get("rrn");
     	System.out.println("rrn = "+rrn);
     	if(!rrn.equals(null)) {
-    		paymentResponse.setTransactionId(transecationId.getString("upi_transaction_id"));
+    		paymentResponse.setTransactionId(transecationId.getString("rrn"));
     	}
     	System.out.println(paymentResponse);
     	return jsonResponseObject;
