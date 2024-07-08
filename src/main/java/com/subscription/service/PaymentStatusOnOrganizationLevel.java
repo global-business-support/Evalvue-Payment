@@ -15,8 +15,6 @@ public class PaymentStatusOnOrganizationLevel {
 	InsertStatusOfPayment insertStatusOfPayment;
 
 	public void setPaymentStatusOnOrgainaztion() {
-		System.out.println("getOrganization_id :"+insertStatusOfPayment.getOrganization_id());
-		System.out.println(insertStatusOfPayment.getIsPaid());
 		orgainatizationSetPaidOrNot.insertPaymentStatusOnOrgainaztion(insertStatusOfPayment.getOrganization_id(),
 				insertStatusOfPayment.getIsPaid());
 	}

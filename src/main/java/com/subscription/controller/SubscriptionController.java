@@ -84,11 +84,10 @@ public class SubscriptionController {
 		return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
 	}
 
-	// @PostMapping("/payment/receipt/")
-	@RequestMapping(value = "/payment/receipt/{subscriptionId}", method = RequestMethod.POST)
-	public ResponseEntity<?> PaymentHistory(@PathVariable("subscriptionId") String subscriptionId) {
+	@PostMapping("/payment/receipt/")	
+	public ResponseEntity<?> PaymentHistory(@RequestParam String subscription_id) {
 
-		JSONObject json = subscriptionInterface.getPymentHistory(subscriptionId);
+		JSONObject json = subscriptionInterface.getPymentHistory(subscription_id);
 
 		if (json != null) {
 			return ResponseEntity.ok(json.toString());
