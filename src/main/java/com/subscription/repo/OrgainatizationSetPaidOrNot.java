@@ -11,6 +11,7 @@ import com.subscription.model.InsertStatusOfPayment;
 
 @Repository
 public interface OrgainatizationSetPaidOrNot extends JpaRepository<InsertStatusOfPayment, Long> {
+	
 	@Modifying
 	@Transactional
 	@Query(value = "UPDATE UserOrganizationMapping SET IsPaid = :isPaid WHERE OrganizationId = :organizationId", nativeQuery = true)

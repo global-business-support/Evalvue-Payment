@@ -83,9 +83,12 @@ public class SubscriptionImpl implements SubscriptionInterface {
 					updateSubscriptionDTO == null ? "Fetching Subcription is NUll" : "Fetch Subscription successfull");
 
 			// Update Data in DB By subscriptionId
-			subscriptionRepo.updateSubscriptionDetailsById(updateSubscriptionDTO.getRazorPaySubscriptionId(),
-					updateSubscriptionDTO.getStartDate(), updateSubscriptionDTO.getNextDueDate(),
-					updateSubscriptionDTO.getEndDate(), updateSubscriptionDTO.getSubscriptionStatusId());
+			subscriptionRepo.updateSubscriptionDetailsById(
+					updateSubscriptionDTO.getRazorPaySubscriptionId(),
+					updateSubscriptionDTO.getStartDate(), 
+					updateSubscriptionDTO.getNextDueDate(),
+					updateSubscriptionDTO.getEndDate(), 
+					updateSubscriptionDTO.getSubscriptionStatusId());
 
 			return true;
 		} catch (RazorpayException e) {
@@ -131,7 +134,6 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			response.put("payment_error", "Payment server down. Please try again sometime :)");
       return response;
 		}
-		return null;
 	}
 
 	@Override
@@ -149,10 +151,18 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			}
 
 			// insert data in db
-			paymentRepository.insertPaymentResponse(paymEntity.getRazorpayPaymentId(), paymEntity.getRazorpayOrderId(),
-					paymEntity.getRazorPaySubscriptionId(), paymEntity.getUserId(), paymEntity.getOrganizationId(),
-					paymEntity.getPaymentStatusId(), paymEntity.getAmount(), paymEntity.getPaymentMode(),
-					paymEntity.getUserEmail(), paymEntity.getContact(), paymEntity.getCreatedOn(),
+			paymentRepository.insertPaymentResponse(
+					paymEntity.getRazorpayPaymentId(), 
+					paymEntity.getRazorpayOrderId(),
+					paymEntity.getRazorPaySubscriptionId(), 
+					paymEntity.getUserId(), 
+					paymEntity.getOrganizationId(),
+					paymEntity.getPaymentStatusId(), 
+					paymEntity.getAmount(),
+					paymEntity.getPaymentMode(),
+					paymEntity.getUserEmail(),
+					paymEntity.getContact(),
+					paymEntity.getCreatedOn(),
 					paymEntity.getTransactionId());
 			System.out.println("Pyment information Successfull insert in db");
 			return response;
@@ -196,7 +206,6 @@ public class SubscriptionImpl implements SubscriptionInterface {
 		Payment razorPayPayment = razorpayClient.payments.fetch(paymentId);
 		//razorPayPayment.get(paymentId);
 		String UpiNo = razorPayPayment.get("vpa");
-		System.out.println(UpiNo);
 		boolean capture = razorPayPayment.get("captured");
 		String card =null;
 		if (capture) {

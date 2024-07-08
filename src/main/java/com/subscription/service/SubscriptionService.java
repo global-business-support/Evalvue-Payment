@@ -118,23 +118,23 @@ public class SubscriptionService {
 		if (status.equals("captured")) {
 			insertStatusOfPayment.setIsPaid((byte) 1);
 			insertStatusOfPayment.setOrganization_id(organizationId);
+			
 		//	System.out.println("isPaid Update date");
 			paymentStatusOnOrganizationLevel.setPaymentStatusOnOrgainaztion();
-			
-			
 		}
-
 		JSONObject transecationId = razorPayPayment.get("acquirer_data");
 		Object rrn = transecationId.get("rrn");
-		System.out.println("rrn = " + rrn);
 		if (!rrn.equals(null)) {
-			paymentResponse.setTransactionId(transecationId.getString("upi_transaction_id"));
+			paymentResponse.setTransactionId(rrn.toString());
 		}
 		System.out.println(paymentResponse);
 		return jsonResponseObject;
 	}
 
 	private Date convertUnixTimeToDate(Object unixTime) throws ParseException {
+		if(unixTime.equals(null)) {
+			return null;
+		}
 		System.out.println(unixTime);
 		long timestamp = Long.parseLong(unixTime.toString()) * 1000L;
 		Date date = new Date(timestamp);
