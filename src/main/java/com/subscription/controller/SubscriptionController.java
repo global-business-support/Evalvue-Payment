@@ -1,5 +1,7 @@
 package com.subscription.controller;
 
+import java.text.ParseException;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +70,7 @@ public class SubscriptionController {
 	}
 
 	@PostMapping("/verify/payment/")
-	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest) {
+	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest) throws ParseException {
 		System.out.println("get data " + paymentRequest);
 		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(paymentRequest.getSubscription_id(),
 				paymentRequest.getPayment_id(), paymentRequest.getUser_id(), paymentRequest.getOrganization_id());
@@ -84,7 +86,8 @@ public class SubscriptionController {
 		return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
 	}
 
-	@PostMapping("/payment/receipt/")	
+
+	@PostMapping("/payment/receipt/")
 	public ResponseEntity<?> PaymentHistory(@RequestParam String subscription_id) {
 
 		JSONObject json = subscriptionInterface.getPymentHistory(subscription_id);
