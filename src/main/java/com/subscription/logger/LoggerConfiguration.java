@@ -13,8 +13,7 @@ public class LoggerConfiguration {
 	private static final Logger subscriptionImplLogger = LoggerFactory.getLogger(SubscriptionImpl.class);
 	private static final Logger subscriptionServiceLogger = LoggerFactory.getLogger(SubscriptionService.class);
 	private static final Logger subscriptionControllerLogger = LoggerFactory.getLogger(SubscriptionController.class);
-	private static final Logger subscriptionLogger = LoggerFactory.getLogger(SubscriptionController.class);
-
+	
 	
 	
 	public static Logger getMainlogger() {

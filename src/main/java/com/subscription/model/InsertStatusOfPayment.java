@@ -25,6 +25,7 @@ public class InsertStatusOfPayment {
 	}
 
 	public void setIsPaid(byte isPaid) {
+		System.out.println(isPaid);
 		this.isPaid = isPaid;
 	}
 

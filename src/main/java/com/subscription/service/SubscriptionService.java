@@ -20,21 +20,18 @@ import com.subscription.response.SubscriptionResponseDTO;
 
 @Service
 public class SubscriptionService {
-
-	// private BitlyService bitlyService;
-
 	private final RazorpayClient razorpayClient;
 	private final UserRequest userRequest;
 	private final PaymentResponseEntity paymentResponse;
 	private int paymentStatusId;
-	// private Boolean captured;
 	private String status;
+	
 	@Autowired
-	InsertStatusOfPayment insertStatusOfPayment;
+	private InsertStatusOfPayment insertStatusOfPayment;
 	@Autowired
-	PaymentStatusOnOrganizationLevel paymentStatusOnOrganizationLevel;
+	private PaymentStatusOnOrganizationLevel paymentStatusOnOrganizationLevel;
 
-	// @Autowired
+	 @Autowired
 	public SubscriptionService(RazorpayClient razorpayClient, UserRequest userRequest,
 			PaymentResponseEntity paymentResponse) {
 		this.razorpayClient = razorpayClient;
@@ -59,16 +56,14 @@ public class SubscriptionService {
 		SubscriptionResponseDTO responseDTO = new SubscriptionResponseDTO();
 		responseDTO.setRazorPaySubscriptionId(subscription.get("id"));
 		status = subscription.get("status");
+//		changes
 		responseDTO.setSubscriptionStatusId(EnumMappingService.getSubscriptionStatusByString(status));
 		responseDTO.setSubscriptionLink(subscription.get("short_url"));
 
 //        // Get Data In UserRequest and set in SubscriptionResponseDTO
-//      
-		System.out.println(userRequest);
 		responseDTO.setUserId(userRequest.getUser_id());
 		responseDTO.setPlanId(userRequest.getPlan_id());
 		responseDTO.setOrganizationId(userRequest.getOrganization_id());
-
 		return responseDTO;
 	}
 
@@ -77,18 +72,13 @@ public class SubscriptionService {
 		SubscriptionResponseDTO responseDTO = new SubscriptionResponseDTO();
 		Subscription subscription = razorpayClient.subscriptions.fetch(subscriptionId);
 		responseDTO.setRazorPaySubscriptionId(subscriptionId);
-		status = subscription.get("status");
+		// changes
 		responseDTO.setSubscriptionStatusId(EnumMappingService.getSubscriptionStatusByString(status));
-		System.out.println("current_start");
 		responseDTO.setStartDate(convertUnixTimeToDate(subscription.get("current_start")));
-		System.out.println("charge_at");
 		responseDTO.setNextDueDate(convertUnixTimeToDate(subscription.get("charge_at")));
-		System.out.println("end_at");
 		responseDTO.setEndDate(convertUnixTimeToDate(subscription.get("end_at")));
 		responseDTO.setSubscriptionLink(subscription.get("short_url"));
-
 		UserRequest user = new UserRequest();
-		System.out.println(user);
 		return responseDTO;
 
 	}
@@ -115,25 +105,27 @@ public class SubscriptionService {
 		paymentResponse.setUserEmail(razorPayPayment.get("email"));
 		paymentResponse.setContact(razorPayPayment.get("contact"));
 		paymentResponse.setCreatedOn(razorPayPayment.get("created_at"));
-		if (status.equals("captured")) {
-			insertStatusOfPayment.setIsPaid((byte) 1);
+		if (captured) {
+			System.out.println("hii");
+			insertStatusOfPayment.setIsPaid((byte)1);
 			insertStatusOfPayment.setOrganization_id(organizationId);
-			
+			System.out.println("byy");
 		//	System.out.println("isPaid Update date");
+			System.out.println();
 			paymentStatusOnOrganizationLevel.setPaymentStatusOnOrgainaztion();
 		}
+		
 		JSONObject transecationId = razorPayPayment.get("acquirer_data");
 		Object rrn = transecationId.get("rrn");
 		if (!rrn.equals(null)) {
 			paymentResponse.setTransactionId(rrn.toString());
 		}
-		System.out.println(paymentResponse);
 		return jsonResponseObject;
 	}
 
 	private Date convertUnixTimeToDate(Object unixTime) throws ParseException {
 		if(unixTime.equals(null)) {
-			return null;
+		  return null;
 		}
 		System.out.println(unixTime);
 		long timestamp = Long.parseLong(unixTime.toString()) * 1000L;

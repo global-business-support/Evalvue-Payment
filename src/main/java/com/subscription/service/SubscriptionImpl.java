@@ -114,8 +114,10 @@ public class SubscriptionImpl implements SubscriptionInterface {
 
 			// SET Entity Data in Subcripiton table in DB
 			subscriptionRepo.saveAllDetailsById(subscriptionDTO.getRazorPaySubscriptionId(),
-					subscriptionDTO.getSubscriptionLink(), subscriptionDTO.getPlanId(),
-					subscriptionDTO.getSubscriptionStatusId(), subscriptionDTO.getUserId(),
+					subscriptionDTO.getSubscriptionLink(), 
+					subscriptionDTO.getPlanId(),
+					subscriptionDTO.getSubscriptionStatusId(),
+					subscriptionDTO.getUserId(),
 					subscriptionDTO.getOrganizationId());
 
 			System.out.println("Subscription created and insert in DB successfully ....");
@@ -157,7 +159,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 					paymEntity.getRazorPaySubscriptionId(), 
 					paymEntity.getUserId(), 
 					paymEntity.getOrganizationId(),
-					paymEntity.getPaymentStatusId(), 
+					paymEntity.getPaymentStatusId(),
 					paymEntity.getAmount(),
 					paymEntity.getPaymentMode(),
 					paymEntity.getUserEmail(),
