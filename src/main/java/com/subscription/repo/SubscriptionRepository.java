@@ -16,7 +16,8 @@ public interface SubscriptionRepository extends JpaRepository<SubscriptionRespon
 	
 	  @Modifying
 	    @Transactional
-	    @Query(nativeQuery = true, value = "INSERT INTO Subscription (RazorPaySubscriptionId, SubscriptionLink, PlanId, SubscriptionStatusId, UserId, OrganizationId) VALUES (:razorPaySubscriptionId, :subscriptionLink, :planId, :subscriptionStatusId, :userId, :organizationId)")
+	    @Query(nativeQuery = true, value = "INSERT INTO Subscription (RazorPaySubscriptionId, SubscriptionLink, PlanId, SubscriptionStatusId, UserId, OrganizationId) "
+	    		+ "VALUES (:razorPaySubscriptionId, :subscriptionLink, :planId, :subscriptionStatusId, :userId, :organizationId)")
 	    void saveAllDetailsById(
 	            @Param("razorPaySubscriptionId") String razorPaySubscriptionId,
 	            @Param("subscriptionLink") String subscriptionLink,
