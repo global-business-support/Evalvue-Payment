@@ -100,9 +100,10 @@ public class SubscriptionImpl implements SubscriptionInterface {
 
 	@Override
 	public JSONObject createSubscription(String razorPayPlanId, int monthlyCycle, UserRequest userRequest) {
-		try {
-			SubscriptionResponseDTO subscriptionDTO = subscriptionService.createSubscriptionAndInsertDB(razorPayPlanId,
-					monthlyCycle, userRequest);
+
+		 JSONObject response = new JSONObject();
+		try {	
+			SubscriptionResponseDTO subscriptionDTO = subscriptionService.createSubscriptionAndInsertDB(razorPayPlanId, monthlyCycle, userRequest);
 			System.out.println(subscriptionDTO);
 			if (subscriptionDTO == null) {
 				System.err.println("SubscriptionResponseDTO is Null in CreateSubcription method");
@@ -116,18 +117,19 @@ public class SubscriptionImpl implements SubscriptionInterface {
 
 			System.out.println("Subscription created and insert in DB successfully ....");
 
-			// Create Response object by JSON (get data in SubscriptionResponseDTO)
-			JSONObject response = new JSONObject();
-			response.put("subscriptionId", subscriptionDTO.getRazorPaySubscriptionId());
-			response.put("subscriptionLink", subscriptionDTO.getSubscriptionLink());
-			response.put("status",
-					"" + EnumMappingService.getSubscriptionStatusById(subscriptionDTO.getSubscriptionStatusId()));
-
-			return response;
-
-		} catch (Exception e) {
+			// Create Response object by JSON (get data in SubscriptionResponseDTO)			   
+		        response.put("subscriptionId",subscriptionDTO.getRazorPaySubscriptionId());
+		        response.put("subscriptionLink", subscriptionDTO.getSubscriptionLink());
+		        response.put("status", ""+EnumMappingService.getSubscriptionStatusById(subscriptionDTO.getSubscriptionStatusId()));
+		        
+		        return response;
+			
+		}
+		catch (Exception e){
 			System.err.println("Subcription created some Error");
 			e.printStackTrace();
+			response.put("payment_error", "Payment server down. Please try again sometime :)");
+      return response;
 		}
 		return null;
 	}
