@@ -7,7 +7,8 @@ public enum SubscriptionStatus {
     COMPLETED(3),
     CANCELLED(4),
     PENDING(5),
-    EXPIRED(6);
+    EXPIRED(6),
+    AUTHENTICATED(7);
 
     private final int value;
 
@@ -25,7 +26,7 @@ public enum SubscriptionStatus {
                 return status;
             }
         }
-        return EXPIRED;
+        return  AUTHENTICATED;
     }
     
     public static SubscriptionStatus fromString(String status) {
@@ -34,7 +35,7 @@ public enum SubscriptionStatus {
                 return s;
             }
         }
-        return EXPIRED;
+        return  AUTHENTICATED;
     }
 }
 

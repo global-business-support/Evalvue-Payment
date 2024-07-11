@@ -1,10 +1,9 @@
 package com.subscription.request;
 
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
-@Configuration
-@ConfigurationProperties(prefix = "user")
+
+@Component
 public class UserRequest {
 
 	private long user_id;
