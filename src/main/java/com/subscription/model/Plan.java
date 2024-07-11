@@ -1,9 +1,12 @@
 package com.subscription.model;
 
+import org.springframework.stereotype.Component;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 
+@Component
 @Entity
 public class Plan {
 	@Id
@@ -44,5 +47,4 @@ public class Plan {
 				+ planIdRazorPayPlanId + "]";
 	}
 
-	
 }

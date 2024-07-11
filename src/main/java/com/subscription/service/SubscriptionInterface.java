@@ -1,19 +1,17 @@
 package com.subscription.service;
 
-import java.text.ParseException;
-
 import org.json.JSONObject;
+import org.springframework.stereotype.Component;
 
-import com.razorpay.RazorpayException;
 import com.subscription.model.Plan;
-import com.subscription.request.UserRequest;
 
+@Component
 public interface SubscriptionInterface {
 
-	public Plan getPlan(int planId);
-	public JSONObject createSubscription(String PlanId, int MonthlyCycle, UserRequest userRequest) throws RazorpayException;
-	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId, Long userId, Long organizationId) throws ParseException;
-	public JSONObject getPymentHistory(String razorpaySubscriptionId);
+	public Plan getPlan(int planId)throws Exception ;
+	public JSONObject createSubscription(String PlanId, int MonthlyCycle) throws Exception ;
+	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId, Long userId, Long organizationId) throws Exception;
+	public JSONObject getPymentHistory(String razorpaySubscriptionId)throws Exception;
 	
 
 }

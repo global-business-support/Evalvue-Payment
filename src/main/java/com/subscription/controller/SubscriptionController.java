@@ -1,20 +1,14 @@
 package com.subscription.controller;
 
-import java.text.ParseException;
-
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,73 +23,57 @@ public class SubscriptionController {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubscriptionController.class);
 
-	private final SubscriptionInterface subscriptionInterface;
-	private final UserRequest userRequest;
-
-	public SubscriptionController(UserRequest userRequest, SubscriptionInterface subscriptionInterface) {
-		this.subscriptionInterface = subscriptionInterface;
-		this.userRequest = userRequest;
-	}
+	@Autowired
+	private SubscriptionInterface subscriptionInterface;
+	@Autowired
+	private UserRequest userRequest;
 
 	@PostMapping("/create/subscription/")
-	public String createSubscription(@RequestBody UserRequest request) {
-		try {
-			logger.info("Received request: {}", request.toString());
-			userRequest.setUser_id(request.getUser_id());
-			userRequest.setOrganization_id(request.getOrganization_id());
-			userRequest.setPlan_id(request.getPlan_id());
-
+	public ResponseEntity<String> createSubscription(@RequestBody UserRequest request) throws Exception {		
+		    userRequest.setPlan_id(request.getPlan_id());
+		    userRequest.setUser_id(request.getUser_id());
+		    userRequest.setOrganization_id(request.getOrganization_id());
+			logger.info("Received create subcription request: {}",userRequest.toString());
+						
 			// Call get plan and return
 			Plan plan = subscriptionInterface.getPlan(request.getPlan_id());
 
 			// call createSubscription and return in JSON
 			JSONObject jsonResponse = subscriptionInterface.createSubscription(plan.getPlanIdRazorPayPlanId(),
-					plan.getMonthlyCycle(), request);
+					plan.getMonthlyCycle());
 
-			if (jsonResponse == null) {
-				jsonResponse.put("payment_error", "Payment server down. Please try again sometime :)");
-				return jsonResponse.toString();
+			if (jsonResponse.toString().endsWith("{}")) {
+				logger.error("Null pointer exception accoured line no : 49", jsonResponse.toString());
+				throw new NullPointerException();
 			}
-
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-
-			return jsonResponse.toString();
-		} catch (Exception e) {
-			logger.error("Error creating subscription");
-			JSONObject error = new JSONObject();
-			error.put("payment_error", "Payment server down. please try again sometime :)");
-			return error.toString(); 
-		}
+			return new ResponseEntity<String>(jsonResponse.toString(),HttpStatus.OK);		
 	}
 
+
 	@PostMapping("/verify/payment/")
-	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest) throws ParseException {
-		System.out.println("get data " + paymentRequest);
+	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest) throws Exception {
+		logger.info("verify Pyament start : {}", paymentRequest);
 		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(paymentRequest.getSubscription_id(),
 				paymentRequest.getPayment_id(), paymentRequest.getUser_id(), paymentRequest.getOrganization_id());
 
-		if (jsonResponse == null) {
-			System.out.println("json is null...");
-			return ResponseEntity.noContent().build();
+		if (jsonResponse.toString().equals("{}")) {
+			logger.error("Null pointer exception accoured line no : 61", jsonResponse.toString());
+			throw new NullPointerException();
 		}
-
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-
-		return ResponseEntity.ok().headers(headers).body(jsonResponse.toString());
+		return ResponseEntity.ok(jsonResponse.toString());
 	}
 
-
+	
 	@PostMapping("/payment/receipt/")
-	public ResponseEntity<?> PaymentHistory(@RequestParam String subscription_id) {
-
+	public ResponseEntity<?> PaymentHistory(@RequestParam String subscription_id) throws Exception {
+		logger.info("Genrate Pyament receipt start : {}", subscription_id);
+		
 		JSONObject json = subscriptionInterface.getPymentHistory(subscription_id);
 
-		if (json != null) {
-			return ResponseEntity.ok(json.toString());
+		if (json.toString().equals("{}")) {
+			logger.error("Null pointer exception accoured line no : 75", json.toString());
+			throw new NullPointerException();
 		}
-
-		return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No content found");
+		return ResponseEntity.ok(json.toString());
 	}
 }

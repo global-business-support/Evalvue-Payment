@@ -2,11 +2,14 @@ package com.subscription.response;
 
 import java.util.Date;
 
+import org.springframework.stereotype.Component;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
+@Component
 @Entity
 @Table(name = "Subscription")
 public class SubscriptionResponseDTO {

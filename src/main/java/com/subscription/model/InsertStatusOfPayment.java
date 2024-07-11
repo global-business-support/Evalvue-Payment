@@ -4,8 +4,6 @@ import org.springframework.stereotype.Component;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
@@ -36,5 +34,13 @@ public class InsertStatusOfPayment {
 	public Long getOrganization_id() {
 		return organization_id;
 	}
+
+	@Override
+	public String toString() {
+		return "InsertStatusOfPayment [organization_id=" + organization_id + ", isPaid=" + isPaid + "]";
+	}
+	
+	
+	
 
 }
