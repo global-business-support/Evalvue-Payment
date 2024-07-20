@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.subscription.response.PaymentResponseEntity;
+import com.subscription.model.PaymentResponseEntity;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<PaymentResponseEntity, Long> {

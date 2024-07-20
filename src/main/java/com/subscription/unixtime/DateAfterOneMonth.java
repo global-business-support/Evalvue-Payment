@@ -1,4 +1,4 @@
-package com.subscription.unix.time;
+package com.subscription.unixtime;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -30,4 +30,6 @@ public class DateAfterOneMonth {
         System.out.println("Unix time after one month at 12 o'clock: " + unixTime);
 		return unixTime;
     }
+
+   
 }
