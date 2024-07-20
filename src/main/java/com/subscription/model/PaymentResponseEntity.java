@@ -1,4 +1,4 @@
-package com.subscription.response;
+package com.subscription.model;
 
 import java.util.Date;
 

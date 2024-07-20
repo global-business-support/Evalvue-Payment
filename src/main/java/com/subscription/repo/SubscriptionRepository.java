@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.subscription.response.SubscriptionResponseDTO;
+import com.subscription.model.SubscriptionResponseDTO;
 
 @Repository
 public interface SubscriptionRepository extends JpaRepository<SubscriptionResponseDTO, Long> {

@@ -17,8 +17,9 @@ import com.subscription.model.Plan;
 import com.subscription.repo.PaymentRepository;
 import com.subscription.repo.PlanRepository;
 import com.subscription.repo.SubscriptionRepository;
-import com.subscription.response.PaymentResponseEntity;
-import com.subscription.response.SubscriptionResponseDTO;
+import com.subscription.service.interfaces.SubscriptionInterface;
+import com.subscription.model.PaymentResponseEntity;
+import com.subscription.model.SubscriptionResponseDTO;
 
 @Service
 public class SubscriptionImpl implements SubscriptionInterface {
@@ -26,6 +27,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	Logger log = LoggerConfiguration.getSubscriptionImplLogger();
 	@Autowired
 	private PlanRepository planRepo;	
+	
 	@Autowired
 	@Lazy
 	private SubscriptionImpl subscriptionImpl;
@@ -169,5 +171,11 @@ public class SubscriptionImpl implements SubscriptionInterface {
 				jsonObject.put("card", card);
 			}
 		}
+	}
+
+	@Override
+	public void handledCancelledSubcription(String subscriptionId) throws Exception {
+	 subscriptionService.cancelledSubcriptionService(subscriptionId);
+	 updateSubcriptionDetailsById(subscriptionId);
 	}
 }

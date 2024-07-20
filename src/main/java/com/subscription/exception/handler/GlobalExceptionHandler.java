@@ -12,10 +12,12 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.microsoft.sqlserver.jdbc.SQLServerException;
 import com.razorpay.RazorpayException;
 import com.subscription.logger.LoggerConfiguration;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 
@@ -98,6 +100,29 @@ public class GlobalExceptionHandler {
 
 	}
 	
+	@ExceptionHandler(JsonProcessingException.class)
+	public ResponseEntity<String> handleJsonProcessingException(JsonProcessingException e){
+		logger.error(e.getMessage(),e.getCause());
+		e.printStackTrace();
+		error.put("payment_error", "JsonProcessingException e");
+		return new ResponseEntity<String>(error.toString(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(IllegalArgumentException.class)
+	public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e){
+		logger.error(e.getMessage(),e.getCause());
+		e.printStackTrace();
+		error.put("payment_error", "IllegalArgumentException e");
+		return new ResponseEntity<String>(error.toString(), HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(IOException.class)
+	public ResponseEntity<String> handleIOException(IOException e){
+		logger.error(e.getMessage(),e.getCause());
+		e.printStackTrace();
+		error.put("payment_error",""+e.getMessage());
+		return new ResponseEntity<String>(error.toString(), HttpStatus.BAD_REQUEST);
+	}
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<String> handleException(Exception e){	
 		logger.error(e.getMessage(),e.getCause());

@@ -11,11 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.subscription.model.Plan;
 import com.subscription.request.PaymentRequest;
 import com.subscription.request.UserRequest;
-import com.subscription.service.SubscriptionInterface;
+import com.subscription.service.interfaces.SubscriptionInterface;
 
 @RestController
 @RequestMapping("/razorpay")
@@ -27,31 +26,30 @@ public class SubscriptionController {
 	private SubscriptionInterface subscriptionInterface;
 	@Autowired
 	private UserRequest userRequest;
-
+	
 	@PostMapping("/create/subscription/")
-	public ResponseEntity<String> createSubscription(@RequestBody UserRequest request) throws Exception {		
-		    userRequest.setPlan_id(request.getPlan_id());
-		    userRequest.setUser_id(request.getUser_id());
-		    userRequest.setOrganization_id(request.getOrganization_id());
-			logger.info("Received create subcription request: {}",userRequest.toString());
-						
-			// Call get plan and return
-			Plan plan = subscriptionInterface.getPlan(request.getPlan_id());
+	public ResponseEntity<String> createSubscriptionAPI(@RequestBody UserRequest request) throws Exception {
+		userRequest.setPlan_id(request.getPlan_id());
+		userRequest.setUser_id(request.getUser_id());
+		userRequest.setOrganization_id(request.getOrganization_id());
+		logger.info("Received create subcription request: {}", userRequest.toString());
 
-			// call createSubscription and return in JSON
-			JSONObject jsonResponse = subscriptionInterface.createSubscription(plan.getPlanIdRazorPayPlanId(),
-					plan.getMonthlyCycle());
+		// Call get plan and return
+		Plan plan = subscriptionInterface.getPlan(request.getPlan_id());
 
-			if (jsonResponse.toString().endsWith("{}")) {
-				logger.error("Null pointer exception accoured line no : 49", jsonResponse.toString());
-				throw new NullPointerException();
-			}
-			return new ResponseEntity<String>(jsonResponse.toString(),HttpStatus.OK);		
+		// call createSubscription and return in JSON
+		JSONObject jsonResponse = subscriptionInterface.createSubscription(plan.getPlanIdRazorPayPlanId(),
+				plan.getMonthlyCycle());
+
+		if (jsonResponse.toString().endsWith("{}")) {
+			logger.error("Null pointer exception accoured line no : 49", jsonResponse.toString());
+			throw new NullPointerException();
+		}
+		return new ResponseEntity<String>(jsonResponse.toString(), HttpStatus.OK);
 	}
 
-
 	@PostMapping("/verify/payment/")
-	public ResponseEntity<String> verifyPayment(@RequestBody PaymentRequest paymentRequest) throws Exception {
+	public ResponseEntity<String> verifyPaymentAPI(@RequestBody PaymentRequest paymentRequest) throws Exception {
 		logger.info("verify Pyament start : {}", paymentRequest);
 		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(paymentRequest.getSubscription_id(),
 				paymentRequest.getPayment_id(), paymentRequest.getUser_id(), paymentRequest.getOrganization_id());
@@ -63,11 +61,10 @@ public class SubscriptionController {
 		return ResponseEntity.ok(jsonResponse.toString());
 	}
 
-	
 	@PostMapping("/payment/receipt/")
-	public ResponseEntity<?> PaymentHistory(@RequestParam String subscription_id) throws Exception {
+	public ResponseEntity<?> PaymentReceiptAPI(@RequestParam String subscription_id) throws Exception {
 		logger.info("Genrate Pyament receipt start : {}", subscription_id);
-		
+
 		JSONObject json = subscriptionInterface.getPymentHistory(subscription_id);
 
 		if (json.toString().equals("{}")) {
@@ -75,5 +72,11 @@ public class SubscriptionController {
 			throw new NullPointerException();
 		}
 		return ResponseEntity.ok(json.toString());
+	}
+
+	@PostMapping("/cancelled/subscription/")
+	public ResponseEntity<String> SubcriptionCancelledAPI(@RequestParam String subscription_id) throws Exception {
+		subscriptionInterface.handledCancelledSubcription(subscription_id);
+		return ResponseEntity.ok("Subscription cancelled successfully......");
 	}
 }
