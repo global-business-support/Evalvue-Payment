@@ -1,6 +1,5 @@
 package com.subscription.enumMapping;
 
-
 public enum SubscriptionStatus {
     CREATED(1),
     ACTIVE(2),
@@ -10,7 +9,7 @@ public enum SubscriptionStatus {
     EXPIRED(6),
     AUTHENTICATED(7);
 
-    private final int value;
+    public final int value;
 
     SubscriptionStatus(int value) {
         this.value = value;
@@ -19,23 +18,4 @@ public enum SubscriptionStatus {
     public int getValue() {
         return value;
     }
-
-    public static SubscriptionStatus fromValue(int value) {
-        for (SubscriptionStatus status : values()) {
-            if (status.value == value) {
-                return status;
-            }
-        }
-        return  AUTHENTICATED;
-    }
-    
-    public static SubscriptionStatus fromString(String status) {
-        for (SubscriptionStatus s : values()) {
-            if (s.name().equalsIgnoreCase(status)) {
-                return s;
-            }
-        }
-        return  AUTHENTICATED;
-    }
 }
-

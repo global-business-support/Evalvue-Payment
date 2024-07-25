@@ -1,6 +1,5 @@
 package com.subscription.service;
 
-import org.apache.el.parser.AstSemicolon;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,10 +66,10 @@ public class SubscriptionService {
 		// Subscription Class
 		responseDTO.setRazorPaySubscriptionId(subscription.get("id"));
 		status = subscription.get("status");
-		int dbChange =EnumMappingService.getSubscriptionStatusByString(status.toString());
+		int dbChange = EnumMappingService.getSubscriptionStatusByString(status.toString());
 		// changes
 		responseDTO.setSubscriptionStatusId(dbChange);
-		log.info("subcriptionStatus : {}", status+"("+dbChange+")");
+		log.info("subcriptionStatus : {}", status + "(" + dbChange + ")");
 		responseDTO.setSubscriptionLink(subscription.get("short_url"));
 
 		// // Get Data In UserRequest and set in SubscriptionResponseDTO
@@ -89,7 +88,7 @@ public class SubscriptionService {
 		int dbChange = EnumMappingService.getSubscriptionStatusByString(status.toString());
 		/// enum
 		responseDTO.setSubscriptionStatusId(dbChange);
-		log.info("subcriptionStatus : {}", status+"("+dbChange+")");
+		log.info("subcriptionStatus : {}", status + "(" + dbChange + ")");
 
 		responseDTO.setStartDate(UnixTimeConverter.convertUnixTimeToDate(subscription.get("start_at")));
 		responseDTO.setNextDueDate(UnixTimeConverter.convertUnixTimeToDate(subscription.get("charge_at")));
@@ -118,7 +117,7 @@ public class SubscriptionService {
 		Boolean captured = razorPayPayment.get("captured");
 		String status = razorPayPayment.get("status");
 		paymentStatusId = EnumMappingService.getPaymentStatus(captured, status);
-		log.info("PaymentStatus : {}", status+"("+paymentStatusId+")");
+		log.info("PaymentStatus : {}", status + "(" + paymentStatusId + ")");
 		JSONObject jsonResponseObject = JsonResponse.paymentResponse(paymentStatusId, razorPayPayment);
 		paymentResponse.setPaymentStatusId(paymentStatusId);
 		paymentResponse.setAmount(razorPayPayment.get("amount"));
@@ -128,7 +127,7 @@ public class SubscriptionService {
 		paymentResponse.setCreatedOn(razorPayPayment.get("created_at"));
 
 		if (captured || status.equalsIgnoreCase("refunded") || status.equalsIgnoreCase("captured")) {
-			insertStatusOfPayment.setIsPaid((byte)1);
+			insertStatusOfPayment.setIsPaid((byte) 1);
 			insertStatusOfPayment.setOrganization_id(organizationId);
 			// Set DB in IsPaid
 			paymentStatusOnOrganizationLevel.setPaymentStatusOnOrgainaztion();
@@ -147,7 +146,7 @@ public class SubscriptionService {
 
 	public void cancelledSubcriptionService(String subscriptionId) throws Exception {
 		razorpayClient.subscriptions.cancel(subscriptionId);
-	    System.out.println(FecthSubcriptionDetails(subscriptionId));    
+		System.out.println(FecthSubcriptionDetails(subscriptionId));
 	}
 
 }

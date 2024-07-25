@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +28,8 @@ public class SubscriptionController {
 	@Autowired
 	private UserRequest userRequest;
 	
+
+	//Creating state
 	@PostMapping("/create/subscription/")
 	public ResponseEntity<String> createSubscriptionAPI(@RequestBody UserRequest request) throws Exception {
 		userRequest.setPlan_id(request.getPlan_id());
@@ -48,9 +51,12 @@ public class SubscriptionController {
 		return new ResponseEntity<String>(jsonResponse.toString(), HttpStatus.OK);
 	}
 
+	
+//	Verify State
 	@PostMapping("/verify/payment/")
 	public ResponseEntity<String> verifyPaymentAPI(@RequestBody PaymentRequest paymentRequest) throws Exception {
 		logger.info("verify Pyament start : {}", paymentRequest);
+		subscriptionInterface.updateSubcriptionDatesAndStatus(paymentRequest.getSubscription_id());
 		JSONObject jsonResponse = subscriptionInterface.paymentVerifiction(paymentRequest.getSubscription_id(),
 				paymentRequest.getPayment_id(), paymentRequest.getUser_id(), paymentRequest.getOrganization_id());
 
@@ -61,6 +67,8 @@ public class SubscriptionController {
 		return ResponseEntity.ok(jsonResponse.toString());
 	}
 
+	
+	//Receipt state
 	@PostMapping("/payment/receipt/")
 	public ResponseEntity<?> PaymentReceiptAPI(@RequestParam String subscription_id) throws Exception {
 		logger.info("Genrate Pyament receipt start : {}", subscription_id);
@@ -74,9 +82,12 @@ public class SubscriptionController {
 		return ResponseEntity.ok(json.toString());
 	}
 
+	
+//	Cancelled state
 	@PostMapping("/cancelled/subscription/")
 	public ResponseEntity<String> SubcriptionCancelledAPI(@RequestParam String subscription_id) throws Exception {
 		subscriptionInterface.handledCancelledSubcription(subscription_id);
 		return ResponseEntity.ok("Subscription cancelled successfully......");
 	}
+
 }
