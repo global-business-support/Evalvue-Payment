@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.3.1</version>
+		<version>3.3.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.subscription</groupId>
@@ -30,16 +30,6 @@
 	<properties>
 		<java.version>17</java.version>
 	</properties>
-	
-	<dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>mssql-jdbc</artifactId>
-                <version>12.6.2.jre11</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
 	<dependencies>
 

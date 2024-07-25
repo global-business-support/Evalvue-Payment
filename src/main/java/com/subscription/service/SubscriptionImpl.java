@@ -52,7 +52,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	@Transactional(rollbackFor = { Exception.class })
 	@Override
 	public Plan getPlan(int planId)   {
-		    log.info("getPlan() function start.....52");
+		    log.info("getPlan() function start.....54");
 			List<Object[]> planObj = planRepo.getPlanDetail(planId);
 			
 			Object[] object = planObj.get(0);
@@ -62,13 +62,14 @@ public class SubscriptionImpl implements SubscriptionInterface {
 			plan.setPlanIdRazorPayPlanId((String) object[0]);
 			plan.setMonthlyCycle((int) object[1]);
 			log.info("paln fetch successfully : {}", plan);
-			log.info("getPlan() function complete.....64");
+			log.info("getPlan() function complete.....66");
 			return plan;
 	}
 
 	@Transactional(rollbackFor = { Exception.class })
-	private void updateSubcriptionDetailsById(String subscriptionId) throws Exception{
-		 log.info("updateSubcriptionDetailsById() function start......68");
+	@Override
+	public void updateSubcriptionDatesAndStatus(String subscriptionId) throws Exception{
+		 log.info("updateSubcriptionDetailsById() function start......71");
 			SubscriptionResponseDTO updateSubscriptionDTO = subscriptionService.FecthSubcriptionDetails(subscriptionId);
 			
 			// Update Data in DB By subscriptionId
@@ -80,13 +81,13 @@ public class SubscriptionImpl implements SubscriptionInterface {
 					updateSubscriptionDTO.getSubscriptionStatusId());
 			
 			log.info("Update endDate, nextDueDate, StartDate in DB By subscriptionId is sucessfully: {}", updateSubscriptionDTO);
-			log.info("updateSubcriptionDetailsById() function complete....82");
+			log.info("updateSubcriptionDetailsById() function complete....84");
 	}
 
 	@Transactional(rollbackFor = { Exception.class })
 	@Override
 	public JSONObject createSubscription(String razorPayPlanId, int monthlyCycle) throws Exception {	
-		    log.info("createSubscription() function start.....87");
+		    log.info("createSubscription() function start.....89");
 		    JSONObject response = new JSONObject();
 			SubscriptionResponseDTO subscriptionDTO = subscriptionService.createSubscriptionAndInsertDB(razorPayPlanId, monthlyCycle);
 					
@@ -104,15 +105,14 @@ public class SubscriptionImpl implements SubscriptionInterface {
 		        response.put("subscriptionId",subscriptionDTO.getRazorPaySubscriptionId());
 		        response.put("subscriptionLink", subscriptionDTO.getSubscriptionLink());
 		        response.put("status", ""+EnumMappingService.getSubscriptionStatusById(subscriptionDTO.getSubscriptionStatusId()));	
-		    	log.info("createSubscription() function complete.......107");
+		    	log.info("createSubscription() function complete.......109");
 		        return response;
 	}
 
 	@Transactional(rollbackFor = { Exception.class })
 	@Override
 	public JSONObject paymentVerifiction(String razorpaySubscriptionId, String paymentId, Long userId, Long organizationId) throws Exception {
-		 log.info("paymentVerifiction() function start..... 112");
-		    updateSubcriptionDetailsById(razorpaySubscriptionId);
+		 log.info("paymentVerifiction() function start..... 114");
 			JSONObject response = subscriptionService.VerificationService(razorpaySubscriptionId, paymentId, userId, organizationId);
 			
 			// insert data in db
@@ -131,7 +131,7 @@ public class SubscriptionImpl implements SubscriptionInterface {
 					paymEntity.getTransactionId());
 			log.info("Pyment information Successfull insert in db: {}",paymEntity);
 			
-			log.info("paymentVerifiction() function complete.......133");
+			log.info("paymentVerifiction() function complete.......135");
 			return response;
 	}
 
@@ -176,6 +176,6 @@ public class SubscriptionImpl implements SubscriptionInterface {
 	@Override
 	public void handledCancelledSubcription(String subscriptionId) throws Exception {
 	 subscriptionService.cancelledSubcriptionService(subscriptionId);
-	 updateSubcriptionDetailsById(subscriptionId);
+	 updateSubcriptionDatesAndStatus(subscriptionId);
 	}
 }
