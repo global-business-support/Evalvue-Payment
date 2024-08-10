@@ -6,12 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.subscription.model.Plan;
 import com.subscription.request.PaymentRequest;
 import com.subscription.request.UserRequest;
@@ -89,5 +89,7 @@ public class SubscriptionController {
 		subscriptionInterface.handledCancelledSubcription(subscription_id);
 		return ResponseEntity.ok("Subscription cancelled successfully......");
 	}
+
+
 
 }

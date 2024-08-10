@@ -8,12 +8,12 @@ import com.razorpay.RazorpayClient;
 @Configuration
 public class RazorPayConfiguration {
 
-    @Value("${razorpay.key.id}")
+	@Value("${razorpay.key.id}")
     private String keyId;
 
     @Value("${razorpay.key.secret}")
     private String keySecret;
-
+    
     @Bean
     public RazorpayClient razorpayClient() throws Exception {
         return new RazorpayClient(keyId, keySecret);
