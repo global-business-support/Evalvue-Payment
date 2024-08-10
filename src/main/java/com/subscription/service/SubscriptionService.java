@@ -81,7 +81,7 @@ public class SubscriptionService {
 	}
 
 	public SubscriptionResponseDTO FecthSubcriptionDetails(String subscriptionId) throws Exception {
-		log.info("FecthSubcriptionDetails() function start..... 84");
+		log.info("FecthSubcriptionDetails() function start..... 83");
 		Subscription subscription = razorpayClient.subscriptions.fetch(subscriptionId);
 		responseDTO.setRazorPaySubscriptionId(subscriptionId);
 		status = subscription.get("status");
